@@ -1,0 +1,64 @@
+@startuml Domænemodel-StockTrack
+
+title Domænemodel – StockTrack
+
+skinparam classBackgroundColor #2d2d2d
+skinparam classFontColor White
+skinparam classBorderColor White
+skinparam arrowColor Black
+skinparam backgroundColor #1a
+
+skinparam class {
+    BackgroundColor #2d2d2d
+    FontColor White
+    BorderColor White
+}
+
+class Portfolio #2e7d5e {
+    «Portfolio»
+    ..
+    Samling af brugerens aktier
+}
+
+class AccountType #a0522d {
+    «AccountType»
+    ..
+    Frie / ASK / Pension
+}
+
+class Holding #3b4da8 {
+    «Holding»
+    ..
+    En aktieposition man ejer
+}
+
+class TaxCalculation #1a5276 {
+    «TaxCalculation»
+    ..
+    Beregnet skattebetaling
+}
+
+class Sale #7b2d2d {
+    «Sale»
+    ..
+    Et registreret salg
+}
+
+class Dividend #4a7c2f {
+    «Dividend»
+    ..
+    Udbyttebetaling
+}
+
+' Relationer
+Portfolio "1" -down-> "1..*" Holding
+AccountType "1" -left-> "1" Holding : har
+
+Holding "1" -down-> "0..*" Sale
+Holding "1" -down-> "0..*" Dividend
+
+Holding "1" -right-> "1" TaxCalculation : giver
+
+Sale "0..*" ..> TaxCalculation : bestemmer skattesats
+Dividend "0..*" ..> TaxCalculation : bestemmer skattesats
+@enduml
