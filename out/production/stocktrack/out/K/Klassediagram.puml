@@ -1,0 +1,82 @@
+@startuml
+
+enum AccountType {
+    FRIE_MIDLER
+    AKTIESPAREKONTO
+    PENSION
+}
+
+class Portfolio {
+    - holdings: List<Holding>
+    + getTotalValue(): double
+    + getTotalGain(): double
+    + getTotalTax(): double
+    + addHolding(h: Holding): void
+    + removeHolding(id: String): void
+}
+
+class Holding {
+    - id: String
+    - ticker: String
+    - name: String
+    - shares: double
+    - avgBuyPrice: double
+    - accountType: AccountType
+    - buyDate: Date
+    - currentPrice: double
+    - sales: List<Sale>
+    - dividends: List<Dividend>
+    + getCurrentValue(): double
+    + getUnrealizedGain(): double
+    + getUnrealizedGainPct(): double
+    + estimatedTax(): double
+    + getTotalDividends(): double
+    + getTotalSaleGain(): double
+}
+
+class Sale {
+    - id: String
+    - shares: double
+    - salePrice: double
+    - buyPrice: double
+    - date: Date
+    - accountType: AccountType
+    + getGain(): double
+    + getTax(): double
+    + getNetGain(): double
+}
+
+class Dividend {
+    - id: String
+    - amount: double
+    - date: Date
+    + getAmount(): double
+    + getDate(): Date
+}
+
+class TaxCalculator {
+    + calculate(gain: double, type: AccountType): double
+    + calculateProgressive(gain: double, married: boolean): double
+}
+
+class StorageService {
+    + savePortfolio(p: Portfolio): void
+    + loadPortfolio(): Portfolio
+    + deleteAll(): void
+}
+
+class QuoteService {
+    + fetchPrices(tickers: List<String>): Map<String, Double>
+    + fetchSinglePrice(ticker: String): double
+}
+
+Portfolio "1" *-- "1..*" Holding : indeholder
+Holding "1" *-- "0..*" Sale : har
+Holding "1" *-- "0..*" Dividend : har
+Holding --> AccountType : bruger
+Sale --> AccountType : bestemmer skat
+Holding ..> TaxCalculator : bruger
+StorageService ..> Portfolio : gemmer/henter
+QuoteService ..> Holding : opdaterer pris
+
+@enduml
